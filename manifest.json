@@ -1,0 +1,15 @@
+{
+    "name": "Bezochte Fietsknooppunten",
+    "version": "1.0",
+    "description": "Toont welke fietsknooppunten je al hebt bezocht op de routeplanner van Route.nl.",
+    "content_scripts": [{
+        "matches": ["*://*.route.nl/routeplanner"],
+        "run_at": "document_idle",
+        "css": ["style.css"],
+        "js": ["inject.js"]
+    }],
+    "web_accessible_resources": [
+        "content.js"
+    ],
+    "manifest_version": 2
+}
