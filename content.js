@@ -70,7 +70,7 @@ function extractPOIs(route) {
  *
  * @param {array} routes
  */
-async function extractAllPOIs(routes) {
+function extractAllPOIs(routes) {
     return routes.reduce((points, route) => {
         return points.concat(extractPOIs(route));
     }, []);
@@ -102,7 +102,7 @@ async function getPoints(userId) {
 
     // Cache points so that the POIs can be highlighted again when the map is
     // redrawn because of zoomin, moving, etc.
-    cache.points = await extractAllPOIs(routes);
+    cache.points = extractAllPOIs(routes);
 
     return cache.points;
 }
