@@ -31,7 +31,7 @@ async function getRoutesUser(userId) {
  * Returns the route's details
  *
  * Note that this endpoint doesn't require authentication; routes marked as
- * private can be assecced by its route ID.
+ * public or private can be accessed by its route ID.
  *
  * @param {number} routeId
  */
