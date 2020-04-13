@@ -1,3 +1,7 @@
 .x-marker-visited {
     background: red !important;
 }
+
+.x-marker-visited>div>span {
+    color: red !important;
+}
