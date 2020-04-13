@@ -20,7 +20,7 @@ async function getRoutesUser(userId) {
     return fetch(url).then(response => {
         // API returns status code 204 is the user isn't logged-in
         if (response.status === 204) {
-            return Promise.reject("Failed to load the user's routes. Make sure that the user is logged-in.");
+            throw new Error("Failed to load the user's routes. Make sure that the user is logged-in.");
         }
 
         return response.json();
@@ -66,17 +66,6 @@ function extractPOIs(route) {
 }
 
 /**
- * Returns the POIs of a collection of routes
- *
- * @param {array} routes
- */
-function extractAllPOIs(routes) {
-    return routes.reduce((points, route) => {
-        return points.concat(extractPOIs(route));
-    }, []);
-}
-
-/**
  * Returns the POIs included in a user's routes
  *
  * @param {number} userId
@@ -85,7 +74,7 @@ async function getPoints(userId) {
     if (Array.isArray(cache.points)) {
         console.info('Loading cached points');
 
-        return Promise.resolve(cache.points);
+        return cache.points;
     }
 
     console.info('Loading the user\'s routes');
@@ -102,7 +91,9 @@ async function getPoints(userId) {
 
     // Cache points so that the POIs can be highlighted again when the map is
     // redrawn because of zoomin, moving, etc.
-    cache.points = extractAllPOIs(routes);
+    cache.points = routes.reduce((points, route) => {
+        return points.concat(extractPOIs(route));
+    }, []);
 
     return cache.points;
 }
