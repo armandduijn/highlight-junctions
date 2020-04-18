@@ -15,4 +15,9 @@ function injectScript(file_path, tag) {
     node.appendChild(script);
 }
 
+window.addEventListener('x-routes', event => {
+    // Send the user's routes to the popup
+    chrome.runtime.sendMessage({ routes: event.detail });
+});
+
 injectScript(chrome.extension.getURL('content.js'), 'body');

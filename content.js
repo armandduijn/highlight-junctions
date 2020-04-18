@@ -87,6 +87,8 @@ async function getPoints(userId) {
         return Promise.all(user.routes.map(route => getRoute(route.id)))
     })();
 
+    window.dispatchEvent(new CustomEvent('x-routes', { detail: routes }));
+
     console.info('Extracting POIs');
 
     // Cache points so that the POIs can be highlighted again when the map is
