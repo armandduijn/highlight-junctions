@@ -2,20 +2,28 @@
 <html>
 
 <head>
+    <link rel="stylesheet" href="style.css" />
     <style>
         body {
-            width: 300px;
+            width: 330px;
             margin: 0;
-            padding: 14px;
-            font-family: Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, Arial, sans-serif;
             font-size: 14px;
             color: #333;
+        }
+        
+        #main {
+            padding: 14px;
         }
         
         h1 {
             font-size: 21px;
             margin: 0 0 10px;
             padding: 0;
+        }
+        
+        p {
+            margin-top: 0;
         }
         
         a {
@@ -64,6 +72,7 @@
         
         #toolbar {
             display: flex;
+            padding: 0 10px;
             font-size: 80%;
         }
         
@@ -74,16 +83,93 @@
         li:hover {
             background: #EEE;
         }
+        
+        .marker {
+            background: #009a4b;
+            height: 26px;
+            width: 26px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .marker div {
+            width: 20px;
+            height: 20px;
+            background: #FFF;
+            font-size: 10px;
+            font-weight: bold;
+            color: #009a4b;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        #legend {
+            font-size: 80%;
+            background: #EEE;
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        #legend-items {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+        }
+        
+        #legend-items>div {
+            display: flex;
+            align-items: center;
+            flex-direction: row;
+        }
+        
+        #legend-items>div>.marker {
+            margin-right: 5px;
+        }
+        
+        #legend-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
     </style>
 </head>
 
 <body>
-    <h1>Routes</h1>
-    <div id="toolbar">
-        <div class="mr-auto">Gesorteerd op aanmaakdatum</div>
-        <a href="#" id="refresh">Ververs</a>
+    <div id="main">
+        <!-- <h1>Routes</h1> -->
+        <p>Kies de routes je wilt terugzien in de routeplanner</p>
+        <div id="toolbar">
+            <div class="mr-auto">Naam</div>
+            <div>Zichtbaar</div>
+        </div>
+        <ul class="routes-list"></ul>
     </div>
-    <ul class="routes-list"></ul>
+    <div id="legend">
+        <div id="legend-title">Uitleg</div>
+        <div id="legend-items">
+            <div>
+                <div class="marker">
+                    <div>
+                        <span>10</span>
+                    </div>
+                </div>
+                <div>Nieuwe knooppunt</div>
+            </div>
+            <div>
+                <div class="marker x-marker-visited">
+                    <div>
+                        <span>11</span>
+                    </div>
+                </div>
+                <div>Bezochte knooppunt</div>
+            </div>
+        </div>
+    </div>
+
     <script src="popup.js"></script>
 </body>
 

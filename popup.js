@@ -79,7 +79,7 @@ class RouteComponent {
         return `
         <li>
             <div class="name">
-                <a href="#" x-click="onClick" title="Bekijk deze route">${this.name}</a>
+                <a href="#" x-click="onClick" title="Bekijk deze route in een nieuw venster">${this.name}</a>
             </div>
             <span class="visible">
                 <input type="checkbox" x-change="onChange" data-id="${this.id}" ${this.visible ? 'checked': ''} />
