@@ -16,7 +16,7 @@ export default class RouteStorage {
             }, result => {
                 this.routes = result[this.key];
 
-                resolve();
+                resolve(this.routes);
             });
         });
     }
