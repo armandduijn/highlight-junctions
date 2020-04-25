@@ -1,30 +1,39 @@
 export default class RouteComponent {
-    constructor(id, name, visible) {
-        this.id = id;
-        this.name = name;
-        this.visible = visible;
-    }
+  /**
+   * Creates a RouteComponent
+   *
+   * @param {number} id - The route's ID
+   * @param {srting} name - The route's name
+   * @param {boolean} visible - If the route should be marked as visible
+   * @param {function} changeHandler - Handles changes to the route's state
+   */
+  constructor(id, name, visible, changeHandler) {
+    this.id = id;
+    this.name = name;
+    this.visible = visible;
+    this.changeHandler = changeHandler;
+  }
 
-    render() {
-        return `
+  render() {
+    return `
         <li>
             <div class="name">
-                <a href="#" x-click="onClick" title="Bekijk deze route in een nieuw venster">${this.name}</a>
+                <a href="#" x-click="onClick" title="Bekijk deze route in een nieuw venster">
+                  ${this.name}
+                </a>
             </div>
             <span class="visible">
                 <input type="checkbox" x-change="onChange" data-id="${this.id}" ${this.visible ? 'checked': ''} />
             </span>
         </li>
         `;
-    }
+  }
 
-    onClick() {
-        chrome.tabs.create({
-            url: `https://www.route.nl/fietsroute/${this.id}`
-        });
-    }
+  onClick() {
+    chrome.tabs.create({url: `https://www.route.nl/fietsroute/${this.id}`});
+  }
 
-    onChange(event) {
-        storage.update(this.id, { visible: event.target.checked });
-    }
+  onChange(event) {
+    this.changeHandler(this.id, {visible: event.target.checked});
+  }
 }

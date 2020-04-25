@@ -1,133 +1,30 @@
-const API = {
-    base: 'https://www.route.nl/api'
-};
+// Setup listener for event sent by the injected script
+window.addEventListener('x-user', event => {
+    const payload = event.detail;
 
-const cache = {
-    points: null
-};
+    // Check if the user is logged-in
+    if (payload.id === null) {
+        return;
+    }
 
-/**
- * Returns the user's routes
- *
- * The user has to be logged-in for the request to succeed. The API authenticates
- * the request using the browser's cookies.
- *
- * @param {number} userId
- */
-async function getRoutesUser(userId) {
-    const url = API.base + '/routes/group/' + userId;
+    (async() => {
+        const module = await import (chrome.runtime.getURL('./content/Highlighter.js'));
+        const Highlighter = module.default;
 
-    return fetch(url).then(response => {
-        // API returns status code 204 is the user isn't logged-in
-        if (response.status === 204) {
-            throw new Error("Failed to load the user's routes. Make sure that the user is logged-in.");
-        }
+        const highlighter = new Highlighter(payload.id);
+        const observer = new MutationObserver(highlighter.getPainter());
 
-        return response.json();
-    });
-}
-
-/**
- * Returns the route's details
- *
- * Note that this endpoint doesn't require authentication; routes marked as
- * public or private can be accessed by its route ID.
- *
- * @param {number} routeId
- */
-async function getRoute(routeId) {
-    const url = API.base + '/route/' + routeId;
-
-    return fetch(url).then(response => response.json());
-}
-
-/**
- * Returns a route's POIs
- *
- * @param {object} route
- */
-function extractPOIs(route) {
-    return route.routePoints
-        .map(point => {
-            if (point.poi == null) {
-                return {};
-            }
-
-            return {
-                id: point.poi.id,
-                name: point.poi.name,
-                category: point.poi.category.categoryType
-            }
-        })
-        .filter(point => {
-            // Remove invalid POIs
-            return Object.keys(point).length > 0
+        // TODO: Use Leaflet's API to listen to state changes
+        // TODO: Fix observer being called twice on page load
+        observer.observe(document.querySelector('.leaflet-marker-pane'), {
+            childList: true
         });
-}
-
-/**
- * Returns the POIs included in a user's routes
- *
- * @param {number} userId
- */
-async function getPoints(userId) {
-    if (Array.isArray(cache.points)) {
-        console.info('Loading cached points');
-
-        return cache.points;
-    }
-
-    console.info('Loading the user\'s routes');
-
-    const user = await getRoutesUser(userId);
-
-    console.info('Loading ' + user.routes.length + ' routes');
-
-    const routes = await (async() => {
-        return Promise.all(user.routes.map(route => getRoute(route.id)))
     })();
-
-    window.dispatchEvent(new CustomEvent('x-routes', { detail: routes }));
-
-    console.info('Extracting POIs');
-
-    // Cache points so that the POIs can be highlighted again when the map is
-    // redrawn because of zoomin, moving, etc.
-    cache.points = routes.reduce((points, route) => {
-        return points.concat(extractPOIs(route));
-    }, []);
-
-    return cache.points;
-}
-
-/**
- * Highlights the POI on the map
- *
- * @param {object} point
- */
-function highlightPointOnMap(point) {
-    var $point = document.querySelector('.route-marker.marker-id-' + point.id);
-
-    // If the POI is visible on the map
-    if ($point) {
-        // Add custom class for styling
-        $point.classList.add('x-marker-visited');
-    }
-}
-
-var observer = new MutationObserver(() => {
-    // Global function that returns the logged-in user's user ID
-    var user_id = window.getActiveUserId();
-
-    getPoints(user_id).then(points => {
-        points.forEach(point => highlightPointOnMap(point));
-    }).catch(error => {
-        console.error(error);
-    });
 });
 
-// TODO: Use Leaflet's API to listen to state changes
-// TODO: Fix observer being called twice on page load
-observer.observe(document.querySelector('.leaflet-marker-pane'), {
-    childList: true
-});
+// Inject script to retrieve the logged-in user's ID
+const script = document.createElement('script');
+script.setAttribute('type', 'text/javascript');
+script.setAttribute('src', chrome.extension.getURL('inject.js'));
+
+document.body.appendChild(script);

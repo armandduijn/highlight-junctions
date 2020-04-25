@@ -1,14 +1,9 @@
 import RouteList from './popup/RouteList.js';
-import RouteStorage from './popup/RouteStorage.js';
+import RouteStorage from './shared/RouteStorage.js';
 
-const repository = new RouteStorage();
-const routeList = new RouteList(document.querySelector('.routes-list'), repository);
+const routeList = new RouteList(
+    document.querySelector('.routes-list'),
+    new RouteStorage(),
+);
 
 routeList.render();
-
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    if ('routes' in request) {
-        storage.routes = storage.merge(request.routes);
-        storage.persist();
-    }
-});
