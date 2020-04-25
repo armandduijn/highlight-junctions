@@ -1,5 +1,6 @@
 import API from './API.js';
 import {MessageType} from './../shared/Message.js';
+import RouteStorage from '../shared/RouteStorage.js';
 
 export default class Highlighter {
   /**
@@ -10,6 +11,8 @@ export default class Highlighter {
   constructor(userId) {
     this.userId = userId;
     this.api = new API();
+
+    this.preferences = new RouteStorage();
 
     chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       if (request.type === MessageType.NOTIFY_CHANGE) {
@@ -33,13 +36,24 @@ export default class Highlighter {
    * Returns the POIs included in a user's routes
    */
   async loadPoints() {
-    const routes = await this.api.getRoutes(this.userId);
+    const [routes, preferences] = await Promise.all([
+      this.api.getRoutes(this.userId),
+      this.preferences.load(),
+    ]);
 
-    // TODO: Hide disabled routes
+    const routesToHide = preferences
+        .filter((route) => (route.visible == false))
+        .map((route) => route.id);
 
-    return routes.reduce((points, route) => {
-      return points.concat(this.extractPOIs(route));
-    }, []);
+    return routes
+        // Only use routes that aren't marked as hidden
+        .filter((route) => {
+          return !routesToHide.includes(route.id);
+        })
+        // Put all route points in one list
+        .reduce((points, route) => {
+          return points.concat(this.extractPOIs(route));
+        }, []);
   }
 
   /**
