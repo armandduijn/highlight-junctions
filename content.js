@@ -8,17 +8,10 @@ window.addEventListener('x-user', event => {
     }
 
     (async() => {
-        const module = await import (chrome.runtime.getURL('./content/Highlighter.js'));
-        const Highlighter = module.default;
+        const module = await import (chrome.runtime.getURL('./content/bootstrap.js'));
+        const bootstrap = module.default;
 
-        const highlighter = new Highlighter(payload.id);
-        const observer = new MutationObserver(highlighter.getPainter());
-
-        // TODO: Use Leaflet's API to listen to state changes
-        // TODO: Fix observer being called twice on page load
-        observer.observe(document.querySelector('.leaflet-marker-pane'), {
-            childList: true
-        });
+        bootstrap(payload.id);
     })();
 });
 

@@ -1,98 +1,89 @@
-import API from './API.js';
-import {MessageType} from './../shared/Message.js';
-import RouteStorage from '../shared/RouteStorage.js';
+import RoutePreferences from '../shared/RoutePreferences.js';
 
 export default class Highlighter {
   /**
    * Creates a Highlighter
    *
-   * @param {number} userId - The user's ID
+   * @param {array} points
    */
-  constructor(userId) {
-    this.userId = userId;
-    this.api = new API();
+  constructor(points) {
+    this.points = points;
+    this.className = 'x-marker-visited';
+  }
 
-    this.preferences = new RouteStorage();
+  static async load(routeCollection) {
+    const highlighter = new this().withObserver();
 
-    chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-      if (request.type === MessageType.NOTIFY_CHANGE) {
-        // TODO: Reload points
-      }
+    await highlighter.setPoints(routeCollection);
+
+    return highlighter;
+  }
+
+  /**
+   * Loads the points
+   *
+   * Takes the preferences into account.
+   *
+   * @param {RouteCollection} routeCollection
+   */
+  async setPoints(routeCollection) {
+    const preferences = await RoutePreferences.load();
+
+    this.points = routeCollection
+        .filter(preferences.getRouteFilter())
+        .getAllPoints();
+  }
+
+  /**
+   * Paints on the Route.nl map
+   */
+  paint() {
+    const $points = document.querySelectorAll(`.${this.className}`);
+
+    // The collection of points might have been changed, remove highlight
+    [...$points].forEach(($point) => $point.classList.remove(this.className));
+
+    // Highlight collection of points
+    this.points.forEach((point) => {
+      this.highlight(point);
     });
   }
 
-  getPainter() {
-    return () => {
-      this.loadPoints(this.userId)
-          .then((points) => {
-            points.forEach((point) => this.highlight(point));
-          }).catch((error) => {
-            console.error(error);
-          });
-    };
-  }
-
   /**
-   * Returns the POIs included in a user's routes
-   */
-  async loadPoints() {
-    const [routes, preferences] = await Promise.all([
-      this.api.getRoutes(this.userId),
-      this.preferences.load(),
-    ]);
-
-    const routesToHide = preferences
-        .filter((route) => (route.visible == false))
-        .map((route) => route.id);
-
-    return routes
-        // Only use routes that aren't marked as hidden
-        .filter((route) => {
-          return !routesToHide.includes(route.id);
-        })
-        // Put all route points in one list
-        .reduce((points, route) => {
-          return points.concat(this.extractPOIs(route));
-        }, []);
-  }
-
-  /**
-   * Returns a route's POIs
+   * Initializes the map observer
    *
-   * @param {object} route
-   * @return {array}
+   * Makes sure that the points are highlighted when the Route.nl map is redrawn.
+   *
+   * @private
+   * @return {self}
    */
-  extractPOIs(route) {
-    return route.routePoints
-        .map((point) => {
-          if (point.poi == null) {
-            return {};
-          }
+  withObserver() {
+    const observer = new MutationObserver(
+        this.paint.bind(this), // Bind `this` to make sure that references works
+    );
 
-          return {
-            id: point.poi.id,
-            name: point.poi.name,
-            category: point.poi.category.categoryType,
-          };
-        })
-        .filter((point) => {
-          // Remove invalid POIs
-          return Object.keys(point).length > 0;
-        });
+    // TODO: Use Leaflet's API to listen to state changes
+    // TODO: Fix observer being called twice on page load
+    observer.observe(document.querySelector('.leaflet-marker-pane'), {
+      childList: true,
+    });
+
+    return this;
   }
 
   /**
-   * Highlights the POI on the map
+   * Highlights the point on the Route.nl map
    *
+   * @private
    * @param {object} point
    */
   highlight(point) {
     const $point = document.querySelector('.route-marker.marker-id-' + point.id);
 
-    // If the POI is visible on the map
+    // If the point is visible on the map
     if ($point) {
       // Add custom class for styling
-      $point.classList.add('x-marker-visited');
+      $point.classList.add(this.className);
     }
   }
 }

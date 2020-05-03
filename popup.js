@@ -1,9 +1,7 @@
 import RouteList from './popup/RouteList.js';
-import RouteStorage from './shared/RouteStorage.js';
 
-const routeList = new RouteList(
-    document.querySelector('.routes-list'),
-    new RouteStorage(),
-);
+(async () => {
+  const routeList = await RouteList.load(document.querySelector('.routes-list'));
 
-routeList.render();
+  routeList.render();
+})();
