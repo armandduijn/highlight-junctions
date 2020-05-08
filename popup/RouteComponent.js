@@ -23,7 +23,7 @@ export default class RouteComponent {
                 </a>
             </div>
             <span class="visible">
-                <input type="checkbox" x-change="onChange" data-id="${this.id}" ${this.visible ? 'checked': ''} />
+                <input type="checkbox" x-change="onChange" ${this.visible ? 'checked': ''} />
             </span>
         </li>
         `;
