@@ -17,6 +17,12 @@ export default class RouteList {
     this.renderer = new ComponentRenderer();
   }
 
+  /**
+   * Initializes a RouteList
+   *
+   * @param {HTMLElement} container
+   * @return {RouteList}
+   */
   static async load(container) {
     const routePreferences = await RoutePreferences.load();
 
@@ -24,7 +30,7 @@ export default class RouteList {
   }
 
   /**
-   * Renders the routes list
+   * Renders the route list
    */
   render() {
     this.container.innerHTML = ''; // Remove content from previous renders
@@ -69,7 +75,7 @@ export default class RouteList {
 
     await this.routePreferences.persist();
 
-    // Notify any running content script that there's an update
+    // Notify the injected content script that there's an update
     chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
       const message = new Message(MessageType.NOTIFY_CHANGE);
 

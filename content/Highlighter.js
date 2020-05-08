@@ -8,9 +8,14 @@ export default class Highlighter {
    */
   constructor(points) {
     this.points = points;
-    this.className = 'x-marker-visited';
+    this.className = 'x-marker-visited'; // Class of custom CSS styling
   }
 
+  /**
+   * Initializes a Highlighter
+   *
+   * @param {RouteCollection} routeCollection
+   */
   static async load(routeCollection) {
     const highlighter = new this().withObserver();
 
@@ -35,35 +40,35 @@ export default class Highlighter {
   }
 
   /**
-   * Paints on the Route.nl map
+   * Highlights the points on the Route.nl map
    */
   paint() {
     const $points = document.querySelectorAll(`.${this.className}`);
 
-    // The collection of points might have been changed, remove highlight
+    // The collection of points might have changed so remove highlight for all
+    // existing points
     [...$points].forEach(($point) => $point.classList.remove(this.className));
 
     // Highlight collection of points
-    this.points.forEach((point) => {
-      this.highlight(point);
-    });
+    this.points.forEach((point) => this.highlight(point));
   }
 
   /**
    * Initializes the map observer
    *
-   * Makes sure that the points are highlighted when the Route.nl map is redrawn.
+   * Makes sure that the points are highlighted when the Route.nl map is
+   * redrawn (because of zooming, panning, etc.).
    *
    * @private
    * @return {self}
    */
   withObserver() {
     const observer = new MutationObserver(
-        this.paint.bind(this), // Bind `this` to make sure that references works
+        this.paint.bind(this), // Bind `this` to make sure that references to `this` work
     );
 
     // TODO: Use Leaflet's API to listen to state changes
-    // TODO: Fix observer being called twice on page load
+    // TODO: Fix observer being called multiple times on page load
     observer.observe(document.querySelector('.leaflet-marker-pane'), {
       childList: true,
     });
@@ -80,9 +85,9 @@ export default class Highlighter {
   highlight(point) {
     const $point = document.querySelector('.route-marker.marker-id-' + point.id);
 
-    // If the point is visible on the map
+    // If the point is visible on the map (some points might be outside the
+    // map's view)
     if ($point) {
-      // Add custom class for styling
       $point.classList.add(this.className);
     }
   }

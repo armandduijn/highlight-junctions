@@ -3,7 +3,7 @@ export default class RouteComponent {
    * Creates a RouteComponent
    *
    * @param {number} id - The route's ID
-   * @param {srting} name - The route's name
+   * @param {string} name - The route's name
    * @param {boolean} visible - If the route should be marked as visible
    * @param {function} changeHandler - Handles changes to the route's state
    */

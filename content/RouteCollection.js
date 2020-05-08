@@ -11,7 +11,7 @@ export default class RouteCollection {
   }
 
   /**
-   * Returns a collection of the user's routes
+   * Initializes a RouteCollection
    *
    * @param {number} user - The user's ID
    * @return {RouteCollection}
@@ -25,7 +25,7 @@ export default class RouteCollection {
   /**
    * Returns the filtered routes
    *
-   * @param {function} callback - Filter function
+   * @param {function} callback - A custom filter function
    * @return {RouteCollection}
    */
   filter(callback) {
@@ -37,7 +37,7 @@ export default class RouteCollection {
   /**
    * Returns the mapped routes
    *
-   * @param {function} callback - Map function
+   * @param {function} callback - A custom map function
    * @return {array}
    */
   map(callback) {
@@ -47,7 +47,6 @@ export default class RouteCollection {
   /**
    * Returns all route points
    *
-   * @param {array} routes - An array of route objects from the API
    * @return {array} A collection of points
    */
   getAllPoints() {

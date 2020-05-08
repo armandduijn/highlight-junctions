@@ -11,6 +11,9 @@ export default class RoutePreferences {
   /**
    * Returns the key to retrieve the preferences from storage
    *
+   * Defined as a static function so that it can be accessed from the load()
+   * function.
+   *
    * @return {string}
    */
   static getStorageKey() {
@@ -18,15 +21,16 @@ export default class RoutePreferences {
   }
 
   /**
-   * Returns a collection of route preferences
+   * Initializes a RoutePreferences
    *
    * @return {RoutePreferences}
    */
   static async load() {
     const key = RoutePreferences.getStorageKey();
+    const defaultValue = []; // Default value if the storage key doesn't exist
 
     return new Promise((resolve) => {
-      chrome.storage.local.get({[key]: []}, (result) => {
+      chrome.storage.local.get({[key]: defaultValue}, (result) => {
         const preferences = result[key];
 
         return resolve(new this(preferences));
@@ -52,14 +56,14 @@ export default class RoutePreferences {
   /**
    * Updates a preference for a specific route
    *
-   * @param {nuumber} id - The route's ID
+   * @param {number} id - The route's ID
    * @param {object} state - The changed state
    */
   update(id, state) {
     const index = this.preferences.findIndex((r) => (r.id === id));
 
     if (index === -1) {
-      throw new Error(`Unknown route ID ${id}.`);
+      throw new Error(`Unknown route ID "${id}".`);
     }
 
     this.preferences[index] = Object.assign({}, this.preferences[index], state);
@@ -85,7 +89,7 @@ export default class RoutePreferences {
   /**
    * Returns the sorted preferences
    *
-   * @param {function} callback - Sort function
+   * @param {function} callback - A custom sort function
    * @return {RouteCollection}
    */
   sort(callback) {
@@ -97,7 +101,7 @@ export default class RoutePreferences {
   /**
    * Returns the mapped preferences
    *
-   * @param {function} callback - Map function
+   * @param {function} callback - A custom map function
    * @return {array}
    */
   map(callback) {
