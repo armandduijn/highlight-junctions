@@ -1,4 +1,4 @@
-import ComponentRenderer from './ComponentRenderer.js';
+import ComponentRenderer from './../shared/ComponentRenderer.js';
 import RouteComponent from './RouteComponent.js';
 import {Message, MessageType} from '../shared/Message.js';
 import RoutePreferences from '../shared/RoutePreferences.js';

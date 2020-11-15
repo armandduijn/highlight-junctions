@@ -11,7 +11,11 @@ window.addEventListener('x-user', event => {
         const module = await import (chrome.runtime.getURL('./content/bootstrap.js'));
         const bootstrap = module.default;
 
-        bootstrap(payload.id);
+        const app = await bootstrap(payload.id);
+
+        window.addEventListener('x-popup', event => {
+            app.enhancePopup(event.detail.id);
+        });
     })();
 });
 

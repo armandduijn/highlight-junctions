@@ -5,3 +5,19 @@
 .x-marker-visited>div>span {
     color: red !important;
 }
+
+.x-routesList {
+    padding-left: 15px;
+}
+
+.x-routesList-item {
+    padding: 5px 0 0;
+}
+
+.x-routesList-item a {
+    display: inline;
+}
+
+.x-routesList-item span {
+    display: inline-block;
+}

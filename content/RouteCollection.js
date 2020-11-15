@@ -80,4 +80,16 @@ export default class RouteCollection {
           return (point !== null);
         });
   }
+
+  /**
+   * Returns routes containing the point
+   *
+   * @param {number} id - The point (POI) id
+   * @returns {array} A subset of the routes
+   */
+  findRoutesByPoint(id) {
+    return this.collection.filter(route => {
+      return route.routePoints.some(point => point.poi?.id === id) // Some POIs don't have an ID (e.g. random marker not aligned to junction)
+    });
+  }
 }
